@@ -9,3 +9,8 @@ const url = ''
 app.listen(PORT, () => {
     console.log(`Server listening or port ${PORT}`)
 })
+
+
+app.get("/url", (req, res, next) => {
+    res.json(["Tony","Lisa","Liam","Ginseng","Fruit"]);
+   });
