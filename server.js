@@ -18,13 +18,17 @@ mongoose.connect(url, {
 
 app.use(cors({
     origin: 'http://localhost:3000',
-    credentials:true,
+    credentials:true
     // methods: ['GET','HEAD','PUT','PATCH','POST','DELETE'],
-    allowedHeaders: 'Content-Type,Access-Token'
+    // allowedHeaders: 'Content-Type,Access-Token'
 }))
 app.use(express.json({limit: '50mb'}))
 app.use(express.urlencoded({ extended: true, limit: '50mb'}))
 
+app.use((req, res, next) => {
+    res.header('Access-Control-Allow-Origin', '*');
+    next();
+  });
 
 app.listen(PORT, () => {
     console.log(`Server listening or port ${PORT}`)
@@ -45,7 +49,12 @@ app.post('/addData', async (req, res)=> {
  });
 
 app.get('/getData', async (req, res)=>{
-    console.log(',,,')
-    let haptic = await Haptic.find();
-    res.send(haptic)
+    request(
+        { url: 'https://joke-api-strict-cors.appspot.com/jokes/random' },
+        (error, response, body) => {
+            console.log(',,,')
+            let haptic = await Haptic.find();
+            res.send(haptic)
+        }
+    )        
 });
