@@ -52,7 +52,7 @@ app.post('/addData', async (req, res)=> {
 app.get('/getData', async (req, res)=>{
     request(
         { url: 'https://joke-api-strict-cors.appspot.com/jokes/random' },
-        (error, response, body) => {
+        async (error, response, body) => {
             console.log(',,,')
             let haptic = await Haptic.find();
             res.send(haptic)
