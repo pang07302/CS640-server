@@ -18,9 +18,9 @@ mongoose.connect(url, {
 
 app.use(cors({
     origin: 'http://localhost:3000',
-    credentials:true
+    credentials:true,
     // methods: ['GET','HEAD','PUT','PATCH','POST','DELETE'],
-    // allowedHeaders: 'Content-Type,Access-Token'
+    allowedHeaders: 'Content-Type,Access-Token'
 }))
 app.use(express.json({limit: '50mb'}))
 app.use(express.urlencoded({ extended: true, limit: '50mb'}))
