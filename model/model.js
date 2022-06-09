@@ -1,22 +1,25 @@
 const mongoose = require('mongoose')
 
 const hapticSchema = new mongoose.Schema({
-        haptic_effects: 
+        haptic_effects: [
           {
-            start: 0,
+            start:Number,
             description: {
-              pattern:Array,
-            //   [
-            //     {
-            //      type: String,
-            //      "length-ms": Number
-            //     }
-            //   ],
+              pattern:[
+                {
+                  type: {
+                    type: String
+                  },
+                 "length-ms": Number
+                }
+              ],
               rate: {
                 frequency: Number
               }
             }
-          },
+          }
+        ],
+          // { type: 'custom', 'length-ms': 100 }
         
       
 })

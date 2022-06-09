@@ -37,18 +37,15 @@ app.get("/url", (req, res, next) => {
 
 app.post('/addData', async (req, res)=> {
     console.log(req.body);
-    console.log(req.body.description.pattern);
     let haptic = new Haptic(req.body)
+    console.log(haptic)
     await haptic.save()
     console.log('create data successfully')
     res.status(200).send(haptic)
-  
  });
 
-//  app.post('/addData', async (req, res) => {
-//     // console.log(req.body)
-//     let event = new Event(req.body)
-//     await event.save()
-//     console.log('create an event successfully')
-//     res.status(200).send(event)
-// })
+app.get('/getData', async (req, res)=>{
+    console.log(',,,')
+    let haptic = await Haptic.find();
+    res.send(haptic)
+});
