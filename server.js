@@ -43,19 +43,23 @@ app.get("/url", (req, res, next) => {
 app.post('/addData', async (req, res)=> {
     console.log(req.body);
     let haptic = new Haptic(req.body)
-    console.log(haptic)
     await haptic.save()
     console.log('create data successfully')
     res.status(200).send(haptic)
  });
 
-app.get('/getData', async (req, res)=>{
-    request(
-        { url: 'https://joke-api-strict-cors.appspot.com/jokes/random' },
-        async (error, response, body) => {
-            console.log(',,,')
-            let haptic = await Haptic.find();
-            res.send(haptic)
-        }
-    )        
+ app.get('/getData', async (req, res)=>{
+    let haptic = await Haptic.find();
+    res.send(haptic)     
 });
+
+// app.get('/getData-proxy', async (req, res)=>{
+//     request(
+//         { url: 'https://joke-api-strict-cors.appspot.com/jokes/random' },
+//         async (error, response, body) => {
+//             console.log(',,,')
+//             let haptic = await Haptic.find();
+//             res.send(haptic)
+//         }
+//     )        
+// });
