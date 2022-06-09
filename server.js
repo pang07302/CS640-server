@@ -4,6 +4,7 @@ const cors = require('cors')
 const PORT = process.env.port || 8000
 const app = express()
 const {Haptic} = require('./model/model')
+const request = require('request');
 
 const url = 'mongodb+srv://user:user@cluster0.ts2fe.mongodb.net/myFirstDatabase?retryWrites=true&w=majority'
 
