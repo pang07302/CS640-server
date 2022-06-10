@@ -18,11 +18,17 @@ mongoose.connect(url, {
 }).catch(err => console.log(err))
 
 app.use(cors({
-    origin: '*',
+    origin: 'http://localhost:3000',
     credentials:true
     // methods: ['GET','HEAD','PUT','PATCH','POST','DELETE'],
     // allowedHeaders: 'Content-Type,Access-Token'
 }))
+
+const corsOpts = {
+    origin: 'http://localhost:3000',
+    allowedHeaders: []
+  }
+
 app.use(express.json({limit: '50mb'}))
 app.use(express.urlencoded({ extended: true, limit: '50mb'}))
 // app.use((req,res,next)=>{
@@ -31,11 +37,10 @@ app.use(express.urlencoded({ extended: true, limit: '50mb'}))
 //     res.setHeader('Access-Control-Allow-Methods','Content-Type','Authorization');
 //     next(); 
 // })
-app.use((req, res, next) => {
-    
-    res.header('Access-Control-Allow-Origin', 'http://192.168.1.3:3000', 'http://192.168.1.10');
-    next();
-  });
+// app.use((req, res, next) => {
+//     res.header('Access-Control-Allow-Origin', '*');
+//     next();
+//   });
 
 app.listen(PORT, () => {
     console.log(`Server listening or port ${PORT}`)
@@ -54,7 +59,7 @@ app.post('/addData', async (req, res)=> {
     res.status(200).send(haptic)
  });
 
- app.get('/getData', async (req, res)=>{
+ app.get('/getData', cors(corsOpts), async (req, res)=>{
     let haptic = await Haptic.find();
     res.send(haptic)     
 });
