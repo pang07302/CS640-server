@@ -18,7 +18,7 @@ mongoose.connect(url, {
 }).catch(err => console.log(err))
 
 app.use(cors({
-    origin: 'http://192.168.1.3:3000',
+    origin: '*',
     credentials:true
     // methods: ['GET','HEAD','PUT','PATCH','POST','DELETE'],
     // allowedHeaders: 'Content-Type,Access-Token'
