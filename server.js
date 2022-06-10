@@ -33,7 +33,7 @@ app.use(express.urlencoded({ extended: true, limit: '50mb'}))
 // })
 app.use((req, res, next) => {
     
-    res.header('Access-Control-Allow-Origin', 'http://192.168.1.3:3000', 'http://192.168.1.10:3000');
+    res.header('Access-Control-Allow-Origin', 'http://192.168.1.3:3000', 'http://192.168.1.10');
     next();
   });
 
