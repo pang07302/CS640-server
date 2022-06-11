@@ -4,16 +4,9 @@ const cors = require('cors')
 const PORT = process.env.port || 8000
 const app = express()
 const {Haptic} = require('./model/model')
-const request = require('request');
 
-// var cors_proxy = require('cors-anywhere');
-// cors_proxy.createServer({
-//     originWhitelist: [], // Allow all origins
-//     requireHeader: ['origin', 'x-requested-with'],
-//     removeHeaders: ['cookie', 'cookie2']
-// }).listen(port, host, function() {
-//     console.log('Running CORS Anywhere on ' + host + ':' + port);
-// });
+
+
 
 const url = 'mongodb+srv://user:user@cluster0.ts2fe.mongodb.net/myFirstDatabase?retryWrites=true&w=majority'
 
@@ -25,6 +18,8 @@ mongoose.connect(url, {
 }).then(()=>{
     console.log('Connected to database')
 }).catch(err => console.log(err))
+
+// https://stackoverflow.com/questions/19743396/cors-cannot-use-wildcard-in-access-control-allow-origin-when-credentials-flag-i
 app.use(cors({
     origin: function(origin, callback){
       return callback(null, true);
@@ -78,14 +73,3 @@ app.post('/addData', async (req, res)=> {
     let haptic = await Haptic.find();
     res.send(haptic)     
 });
-
-// app.get('/getData-proxy', async (req, res)=>{
-//     request(
-//         { url: 'https://joke-api-strict-cors.appspot.com/jokes/random' },
-//         async (error, response, body) => {
-//             console.log(',,,')
-//             let haptic = await Haptic.find();
-//             res.send(haptic)
-//         }
-//     )        
-// });
