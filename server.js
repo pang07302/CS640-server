@@ -6,13 +6,14 @@ const app = express()
 const {Haptic} = require('./model/model')
 const request = require('request');
 
-var cors_proxy = require('cors-anywhere');
-cors_proxy.createServer({
-    originWhitelist: [], // Allow all origins
-    requireHeader: ['origin', 'x-requested-with'],
-    removeHeaders: ['cookie', 'cookie2']
-})
-
+// var cors_proxy = require('cors-anywhere');
+// cors_proxy.createServer({
+//     originWhitelist: [], // Allow all origins
+//     requireHeader: ['origin', 'x-requested-with'],
+//     removeHeaders: ['cookie', 'cookie2']
+// }).listen(port, host, function() {
+//     console.log('Running CORS Anywhere on ' + host + ':' + port);
+// });
 
 const url = 'mongodb+srv://user:user@cluster0.ts2fe.mongodb.net/myFirstDatabase?retryWrites=true&w=majority'
 
@@ -33,7 +34,7 @@ app.use(cors({
 }))
 
 const corsOpts = {
-    origin: 'http://localhost:3000',
+    origin: 'http://localhost:3000'|'*',
     allowedHeaders: []
   }
 
@@ -68,7 +69,6 @@ app.post('/addData', async (req, res)=> {
  });
 
  app.get('/getData', cors(corsOpts), async (req, res)=>{
-    res.set('Access-Control-Allow-Origin', '*');
     let haptic = await Haptic.find();
     res.send(haptic)     
 });
