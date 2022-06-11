@@ -25,13 +25,19 @@ mongoose.connect(url, {
 }).then(()=>{
     console.log('Connected to database')
 }).catch(err => console.log(err))
-
 app.use(cors({
-    origin: 'http://localhost:3000',
-    credentials:true
-    // methods: ['GET','HEAD','PUT','PATCH','POST','DELETE'],
-    // allowedHeaders: 'Content-Type,Access-Token'
-}))
+    origin: function(origin, callback){
+      return callback(null, true);
+    },
+    optionsSuccessStatus: 200,
+    credentials: true
+  }));
+// app.use(cors({
+//     origin: 'http://localhost:3000',
+//     credentials:true
+//     // methods: ['GET','HEAD','PUT','PATCH','POST','DELETE'],
+//     // allowedHeaders: 'Content-Type,Access-Token'
+// }))
 
 const corsOpts = {
     origin: 'http://localhost:3000'|'*',
@@ -68,7 +74,7 @@ app.post('/addData', async (req, res)=> {
     res.status(200).send(haptic)
  });
 
- app.get('/getData', cors(corsOpts), async (req, res)=>{
+ app.get('/getData', async (req, res)=>{
     let haptic = await Haptic.find();
     res.send(haptic)     
 });
