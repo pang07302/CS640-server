@@ -4,7 +4,7 @@ const cors = require('cors')
 const PORT = process.env.port || 8000
 const app = express()
 const {Haptic} = require('./model/model')
-const shell = require('shelljs')
+
 
 
 
