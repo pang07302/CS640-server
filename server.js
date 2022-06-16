@@ -70,7 +70,7 @@ app.post('/addData', async (req, res)=> {
     res.send(haptic)     
 });
 
-app.get('/fan', (req,res)=>{
-    console.log(req.query);
+app.get('/fan/:req', (req,res)=>{
+    console.log(req.params.req);
     res.send("haha")
 });
