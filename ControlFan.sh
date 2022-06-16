@@ -1,4 +1,4 @@
 #!/bin/bash
 echo "Try..."
-order = $req
+order = $order
 $(sudo echo "order") 

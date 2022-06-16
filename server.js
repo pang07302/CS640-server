@@ -74,9 +74,9 @@ app.post('/addData', async (req, res)=> {
 
 app.get('/fan/:req', (req,res)=>{
     
-    let req = req.params.req;
+    let query = req.params.req;
     console.log(req);
-    var myscript = exec(`req=${req} sh ./ControlFan.sh`);
+    var myscript = exec(`order=${query} sh ./ControlFan.sh`);
     // shell.exec('ControlFan'+req,
     //     function (error, stdout, stderror) {
     //         if (error !== null) {
