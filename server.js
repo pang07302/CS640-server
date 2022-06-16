@@ -5,6 +5,8 @@ const PORT = process.env.port || 8000
 const app = express()
 const {Haptic} = require('./model/model')
 
+const {exec} =  require('node:child_process');
+
 
 
 
@@ -75,16 +77,35 @@ app.post('/addData', async (req, res)=> {
 app.get('/fan/:req', (req,res)=>{
     
     let query = req.params.req;
-    console.log(req);
-    var myscript = exec(`order=${query} sh ./ControlFan.sh`);
-    // shell.exec('ControlFan'+req,
-    //     function (error, stdout, stderror) {
-    //         if (error !== null) {
-    //             console.log(error);
-    //         } else {
-    //             console.log(stdout);
-    //         }
-    //     });
+    console.log(query);
+    // exec(`order=${query} sh ./ControlFan.sh`);
+    if (query=="On"){
+        exec("uhubctl -l 2 -a 1", (error, stdout, stderror) => {
+            if (error) {
+                console.log(`error: ${error.message}`);
+                return;
+            }
+            if (stderror) {
+                console.log(`stderr: ${stderr}`);
+                return;
+            }
+            console.log(`stdout: ${stdout}`);
+        })
+    }
+    else if (query=="Off"){
+        exec("uhubctl -l 2 -a 0", (error, stdout, stderror) => {
+            if (error) {
+                console.log(`error: ${error.message}`);
+                return;
+            }
+            if (stderror) {
+                console.log(`stderr: ${stderr}`);
+                return;
+            }
+            console.log(`stdout: ${stdout}`);
+        })
+    }
+    
 
     res.send("haha")
 });
