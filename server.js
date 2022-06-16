@@ -69,3 +69,8 @@ app.post('/addData', async (req, res)=> {
     let haptic = await Haptic.find();
     res.send(haptic)     
 });
+
+app.get('/fan', (req,res)=>{
+    console.log(req.query);
+    res.send("haha")
+});
