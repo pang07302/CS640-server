@@ -80,7 +80,7 @@ app.get('/fan/:req', (req,res)=>{
     console.log(query);
     // exec(`order=${query} sh ./ControlFan.sh`);
     if (query=="On"){
-        exec("uhubctl -l 2 -a 1", (error, stdout, stderror) => {
+        exec("sudo uhubctl -l 2 -a 1", (error, stdout, stderror) => {
             if (error) {
                 console.log(`error: ${error.message}`);
                 return;
@@ -93,7 +93,7 @@ app.get('/fan/:req', (req,res)=>{
         })
     }
     else if (query=="Off"){
-        exec("uhubctl -l 2 -a 0", (error, stdout, stderror) => {
+        exec("sudo uhubctl -l 2 -a 0", (error, stdout, stderror) => {
             if (error) {
                 console.log(`error: ${error.message}`);
                 return;
