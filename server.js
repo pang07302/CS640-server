@@ -74,7 +74,7 @@ app.post('/addData', async (req, res)=> {
 
 app.get('/fan/:req', (req,res)=>{
     
-    let {req} = req.params;
+    let req = req.params.req;
     console.log(req);
     var myscript = exec(`req=${req} sh ./ControlFan.sh`);
     // shell.exec('ControlFan'+req,
