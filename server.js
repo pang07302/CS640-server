@@ -4,9 +4,11 @@ const cors = require('cors')
 const PORT = process.env.port || 8000
 const app = express()
 const {Haptic} = require('./model/model')
+const shell = require('shelljs')
 
 
 
+// https://www.freecodecamp.org/news/shell-scripting-crash-course-how-to-write-bash-scripts-in-linux/#:~:text=What%20is%20a%20Bash%20Script%3F,it%20using%20the%20command%20line.
 
 const url = 'mongodb+srv://user:user@cluster0.ts2fe.mongodb.net/myFirstDatabase?retryWrites=true&w=majority'
 
@@ -71,6 +73,18 @@ app.post('/addData', async (req, res)=> {
 });
 
 app.get('/fan/:req', (req,res)=>{
-    console.log(req.params.req);
+    
+    let {req} = req.params;
+    console.log(req);
+    var myscript = exec(`req=${req} sh ./ControlFan.sh`);
+    // shell.exec('ControlFan'+req,
+    //     function (error, stdout, stderror) {
+    //         if (error !== null) {
+    //             console.log(error);
+    //         } else {
+    //             console.log(stdout);
+    //         }
+    //     });
+
     res.send("haha")
 });
