@@ -1,0 +1,44 @@
+{
+    "device":[
+        {
+            "id": 1,
+            "name": "LED-light"
+        },
+        {
+            "id": 2,
+            "name": "VR-Headset"
+        },
+        {
+            "id": 3,
+            "name": "headphone"
+        },
+        {
+            "id": 4,
+            "name": "speaker"
+        },
+        {
+            "id": 5,
+            "name": "exoskeletons"
+        },
+        {
+            "id": 6,
+            "name": "glove"
+        },
+        {
+            "id": 7,
+            "name": "joysticks"
+        },
+        {
+            "id": 8,
+            "name": "fan"
+        },
+        {
+            "id": 9,
+            "name": "olfactometers"
+        },
+        {
+            "id": 10,
+            "name": "electronic cigarettes"
+        }
+    ]
+}
