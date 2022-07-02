@@ -235,10 +235,8 @@ app.get('/getDeviceEffect/:req', async(req,res)=>{
     })    
 })
 
-app.get('/createEffect/:deviceId', async(req,res) => {
-    console.log(req.body)
-    console.log(req.params.deviceId)
-    console.log(req.body.sight_effects[0].description)
+app.get('/CreateEffect/:deviceId', async(req,res) => {
+    
     let category = Object.keys(req.body)[0];
     let collection;
     switch (category){
@@ -252,5 +250,123 @@ app.get('/createEffect/:deviceId', async(req,res) => {
     effect.deviceId = req.params.deviceId;
     await effect.save();
     console.log('create data successfully')
+    res.status(200).send(effect)
+})
+
+app.get('/ManageEffect/:effectId', async(req,res) => {
+    let category = Object.keys(req.body)[0];
+    console.log(req.params.effectId)
+    let effect;
+    switch (category){
+        case "sight_effects":
+            effect = await Sight.findById(req.params.effectId)
+            effect.sight_effects[0].start = req.body.sight_effects[0].start;
+            effect.sight_effects[1].start = req.body.sight_effects[1].start;
+            effect.sight_effects[2].start = req.body.sight_effects[2].start;
+            effect.sight_effects[3].start = req.body.sight_effects[3].start;
+            effect.sight_effects[0].description.pattern[0].type = req.body.sight_effects[0].description.pattern[0].type
+            effect.sight_effects[1].description.pattern[0].type = req.body.sight_effects[1].description.pattern[0].type
+            effect.sight_effects[2].description.pattern[0].type = req.body.sight_effects[2].description.pattern[0].type
+            effect.sight_effects[3].description.pattern[0].type = req.body.sight_effects[3].description.pattern[0].type
+            effect.sight_effects[0].description.pattern[0].LengthMs = req.body.sight_effects[0].description.pattern[0].LengthMs 
+            effect.sight_effects[1].description.pattern[0].LengthMs = req.body.sight_effects[1].description.pattern[0].LengthMs 
+            effect.sight_effects[2].description.pattern[0].LengthMs = req.body.sight_effects[2].description.pattern[0].LengthMs 
+            effect.sight_effects[3].description.pattern[0].LengthMs = req.body.sight_effects[3].description.pattern[0].LengthMs 
+            effect.sight_effects[0].description.rate.frequency = req.body.sight_effects[0].description.rate.frequency
+            effect.sight_effects[1].description.rate.frequency = req.body.sight_effects[1].description.rate.frequency
+            effect.sight_effects[2].description.rate.frequency = req.body.sight_effects[2].description.rate.frequency
+            effect.sight_effects[3].description.rate.frequency = req.body.sight_effects[3].description.rate.frequency
+            effect.sight_effects[0].description.pattern[0].colour = req.body.sight_effects[0].description.pattern[0].colour 
+            effect.sight_effects[1].description.pattern[0].colour = req.body.sight_effects[1].description.pattern[0].colour 
+            effect.sight_effects[2].description.pattern[0].colour = req.body.sight_effects[2].description.pattern[0].colour 
+            effect.sight_effects[3].description.pattern[0].colour = req.body.sight_effects[3].description.pattern[0].colour 
+            break;
+        case "audio_effects": 
+            effect = await Audio.findById(req.params.effectId)
+            effect.audio_effects[0].start = req.body.audio_effects[0].start;
+            effect.audio_effects[1].start = req.body.audio_effects[1].start;
+            effect.audio_effects[2].start = req.body.audio_effects[2].start;
+            effect.audio_effects[3].start = req.body.audio_effects[3].start;
+            effect.audio_effects[0].description.pattern[0].type = req.body.audio_effects[0].description.pattern[0].type
+            effect.audio_effects[1].description.pattern[0].type = req.body.audio_effects[1].description.pattern[0].type
+            effect.audio_effects[2].description.pattern[0].type = req.body.audio_effects[2].description.pattern[0].type
+            effect.audio_effects[3].description.pattern[0].type = req.body.audio_effects[3].description.pattern[0].type
+            effect.audio_effects[0].description.pattern[0].LengthMs = req.body.audio_effects[0].description.pattern[0].LengthMs 
+            effect.audio_effects[1].description.pattern[0].LengthMs = req.body.audio_effects[1].description.pattern[0].LengthMs 
+            effect.audio_effects[2].description.pattern[0].LengthMs = req.body.audio_effects[2].description.pattern[0].LengthMs 
+            effect.audio_effects[3].description.pattern[0].LengthMs = req.body.audio_effects[3].description.pattern[0].LengthMs 
+            effect.audio_effects[0].description.rate.frequency = req.body.audio_effects[0].description.rate.frequency
+            effect.audio_effects[1].description.rate.frequency = req.body.audio_effects[1].description.rate.frequency
+            effect.audio_effects[2].description.rate.frequency = req.body.audio_effects[2].description.rate.frequency
+            effect.audio_effects[3].description.rate.frequency = req.body.audio_effects[3].description.rate.frequency
+            break;
+        case "haptic_effects": 
+            effect = await Haptic.findById(req.params.effectId)
+            effect.haptic_effects[0].start = req.body.haptic_effects[0].start;
+            effect.haptic_effects[1].start = req.body.haptic_effects[1].start;
+            effect.haptic_effects[2].start = req.body.haptic_effects[2].start;
+            effect.haptic_effects[3].start = req.body.haptic_effects[3].start;
+            effect.haptic_effects[0].description.pattern[0].type = req.body.haptic_effects[0].description.pattern[0].type
+            effect.haptic_effects[1].description.pattern[0].type = req.body.haptic_effects[1].description.pattern[0].type
+            effect.haptic_effects[2].description.pattern[0].type = req.body.haptic_effects[2].description.pattern[0].type
+            effect.haptic_effects[3].description.pattern[0].type = req.body.haptic_effects[3].description.pattern[0].type
+            effect.haptic_effects[0].description.pattern[0].LengthMs = req.body.haptic_effects[0].description.pattern[0].LengthMs 
+            effect.haptic_effects[1].description.pattern[0].LengthMs  = req.body.haptic_effects[1].description.pattern[0].LengthMs 
+            effect.haptic_effects[2].description.pattern[0].LengthMs  = req.body.haptic_effects[2].description.pattern[0].LengthMs 
+            effect.haptic_effects[3].description.pattern[0].LengthMs  = req.body.haptic_effects[3].description.pattern[0].LengthMs 
+            effect.haptic_effects[0].description.rate.frequency = req.body.haptic_effects[0].description.rate.frequency
+            effect.haptic_effects[1].description.rate.frequency = req.body.haptic_effects[1].description.rate.frequency
+            effect.haptic_effects[2].description.rate.frequency = req.body.haptic_effects[2].description.rate.frequency
+            effect.haptic_effects[3].description.rate.frequency = req.body.haptic_effects[3].description.rate.frequency
+            break;
+        case "smell_effects": 
+            effect = await Smell.findById(req.params.effectId)
+            effect.smell_effects[0].start = req.body.smell_effects[0].start;
+            effect.smell_effects[1].start = req.body.smell_effects[1].start;
+            effect.smell_effects[2].start = req.body.smell_effects[2].start;
+            effect.smell_effects[3].start = req.body.smell_effects[3].start;
+            effect.smell_effects[0].description.pattern[0].type = req.body.smell_effects[0].description.pattern[0].type
+            effect.smell_effects[1].description.pattern[0].type = req.body.smell_effects[1].description.pattern[0].type
+            effect.smell_effects[2].description.pattern[0].type = req.body.smell_effects[2].description.pattern[0].type
+            effect.smell_effects[3].description.pattern[0].type = req.body.smell_effects[3].description.pattern[0].type
+            effect.smell_effects[0].description.pattern[0].LengthMs = req.body.smell_effects[0].description.pattern[0].LengthMs 
+            effect.smell_effects[1].description.pattern[0].LengthMs = req.body.smell_effects[1].description.pattern[0].LengthMs 
+            effect.smell_effects[2].description.pattern[0].LengthMs = req.body.smell_effects[2].description.pattern[0].LengthMs 
+            effect.smell_effects[3].description.pattern[0].LengthMs = req.body.smell_effects[3].description.pattern[0].LengthMs 
+            effect.smell_effects[0].description.rate.frequency = req.body.audio_effects[0].description.rate.frequency
+            effect.smell_effects[1].description.rate.frequency = req.body.audio_effects[1].description.rate.frequency
+            effect.smell_effects[2].description.rate.frequency = req.body.audio_effects[2].description.rate.frequency
+            effect.smell_effects[3].description.rate.frequency = req.body.audio_effects[3].description.rate.frequency
+            effect.smell_effects[0].description.pattern[0].fragrance = req.body.smell_effects[0].description.pattern[0].fragrance 
+            effect.smell_effects[1].description.pattern[0].fragrance = req.body.smell_effects[1].description.pattern[0].fragrance 
+            effect.smell_effects[2].description.pattern[0].fragrance = req.body.smell_effects[2].description.pattern[0].fragrance 
+            effect.smell_effects[3].description.pattern[0].fragrance = req.body.smell_effects[3].description.pattern[0].fragrance 
+            break;
+        case "taste_effects":
+            effect = await Taste.findById(req.params.effectId)
+            effect.taste_effects[0].start = req.body.taste_effects[0].start;
+            effect.taste_effects[1].start = req.body.taste_effects[1].start;
+            effect.taste_effects[2].start = req.body.taste_effects[2].start;
+            effect.taste_effects[3].start = req.body.taste_effects[3].start;
+            effect.taste_effects[0].description.pattern[0].type = req.body.taste_effects[0].description.pattern[0].type
+            effect.taste_effects[1].description.pattern[0].type = req.body.taste_effects[1].description.pattern[0].type
+            effect.taste_effects[2].description.pattern[0].type = req.body.taste_effects[2].description.pattern[0].type
+            effect.taste_effects[3].description.pattern[0].type = req.body.taste_effects[3].description.pattern[0].type
+            effect.taste_effects[0].description.pattern[0].LengthMs = req.body.taste_effects[0].description.pattern[0].LengthMs 
+            effect.taste_effects[1].description.pattern[0].LengthMs = req.body.taste_effects[1].description.pattern[0].LengthMs 
+            effect.taste_effects[2].description.pattern[0].LengthMs = req.body.taste_effects[2].description.pattern[0].LengthMs 
+            effect.taste_effects[3].description.pattern[0].LengthMs = req.body.taste_effects[3].description.pattern[0].LengthMs 
+            effect.taste_effects[0].description.rate.frequency = req.body.taste_effects[0].description.rate.frequency
+            effect.taste_effects[1].description.rate.frequency = req.body.taste_effects[1].description.rate.frequency
+            effect.taste_effects[2].description.rate.frequency = req.body.taste_effects[2].description.rate.frequency
+            effect.taste_effects[3].description.rate.frequency = req.body.taste_effects[3].description.rate.frequency
+            effect.taste_effects[0].description.pattern[0].flavour = req.body.taste_effects[0].description.pattern[0].flavour 
+            effect.taste_effects[1].description.pattern[0].flavour = req.body.taste_effects[1].description.pattern[0].flavour 
+            effect.taste_effects[2].description.pattern[0].flavour = req.body.taste_effects[2].description.pattern[0].flavour 
+            effect.taste_effects[3].description.pattern[0].flavour = req.body.taste_effects[3].description.pattern[0].flavour 
+            break;
+    }    
+    await effect.save();
+    console.log(effect);
     res.status(200).send(effect)
 })

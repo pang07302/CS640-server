@@ -11,7 +11,7 @@ const hapticSchema = new mongoose.Schema({
                   type: {
                     type: String
                   },
-                 "length-ms": Number
+                 LengthMs: Number
                 }
               ],
               rate: {
@@ -34,7 +34,7 @@ const sightSchema = new mongoose.Schema({
             type: {
               type: String
             },
-           "length-ms": Number,
+           LengthMs: Number,
            colour: String
           }
         ],
@@ -58,7 +58,7 @@ const audioSchema = new mongoose.Schema({
             type: {
               type: String
             },
-           "length-ms": Number
+           LengthMs: Number
           }
         ],
         rate: {
@@ -81,8 +81,8 @@ const smellSchema = new mongoose.Schema({
             type: {
               type: String
             },
-           "length-ms": Number,
-           "fragrance": String
+           LengthMs: Number,
+           fragrance: String
           }
         ],
         rate: {
@@ -105,8 +105,8 @@ const tasteSchema = new mongoose.Schema({
             type: {
               type: String
             },
-           "length-ms": Number,
-           "flavour": String
+           LengthMs: Number,
+           flavour: String
           }
         ],
         rate: {
