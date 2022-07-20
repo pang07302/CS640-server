@@ -4,9 +4,8 @@ const cors = require('cors')
 const PORT = process.env.port || 8000
 const app = express()
 const {Device, Effect, Sight, Audio, Haptic, Smell, Taste} = require('./model/model')
-
 const {exec} =  require('node:child_process');
-
+const responseTime = require('response-time');
 
 
 
@@ -31,10 +30,14 @@ app.use(cors({
     optionsSuccessStatus: 200,
     credentials: true
   }));
+  app.use(responseTime((req, res, time) => {
+    console.log(`${req.method} ${req.url} ${time}`);
+  }))
 
 
 app.use(express.json({limit: '50mb'}))
 app.use(express.urlencoded({ extended: true, limit: '50mb'}))
+
 
 app.listen(PORT, () => {
     console.log(`Server listening or port ${PORT}`)
@@ -138,9 +141,17 @@ app.get('/taste/:id', async(req,res)=>{
     res.status(200).send(taste)
 });
 
+const getDurationInMilliseconds = (time) => {
+    const diff = process.hrtime(time)
+    return (diff[0] * 1e9 + diff[1]) / 1e9
+    
+}
+
+
 // check whether the default table contains the device
 app.get('/fans', async(req,res)=>{
-    console.log(req.body);
+    let start = process.hrtime();
+    
     Device.findOne({name: req.body.name}, async(err, device) => {
         if (err) throw err
         if (!device){
@@ -173,9 +184,35 @@ app.get('/fans', async(req,res)=>{
             //         console.log(`stdout: ${stdout}`);
             //     })
             // }   
+            let time = getDurationInMilliseconds(start);
             
             console.log(`Device: ${device.name}, ID: ${device.id} is ${req.body.status}`)
-            res.status(200).send(`Device ID: ${device.id} is ${req.body.status}`); 
+            res.status(200).send(`Device ID: ${device.id} is ${req.body.status}, time: ${time}`); 
+        }
+    })    
+});
+
+app.get('/customDevice', async(req,res)=>{
+    console.log(req.body);
+    let len = await Device.count()
+    // console.log(len)
+    Device.findOne({name: req.body.name}, async(err, device) => {
+        if (err) throw err
+        if (device){
+            console.log('Device is already exists')
+            res.send('Device is already exists')
+        } else{
+            
+       
+            // console.log(len);
+            
+
+            let device = new Device({name:req.body.name, id:len+1});
+            console.log(device);
+            device.save();
+            
+            console.log(`Device: ${device.name}, ID: ${device.id} is ${req.body.status}`)
+            res.status(200).send(`Device ID: ${device.name} is added `); 
         }
     })    
 });
@@ -370,3 +407,4 @@ app.get('/ManageEffect/:effectId', async(req,res) => {
     console.log(effect);
     res.status(200).send(effect)
 })
+
