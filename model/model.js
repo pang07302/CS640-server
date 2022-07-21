@@ -2,6 +2,7 @@ const mongoose = require('mongoose')
 
 const hapticSchema = new mongoose.Schema({
         deviceId : String,
+        control:String,
         haptic_effects: [
           {
             start:Number,
@@ -25,6 +26,7 @@ const Haptic = new mongoose.model('Haptic', hapticSchema);
 
 const sightSchema = new mongoose.Schema({
   deviceId : String,
+  control:String,
   sight_effects: [
     {
       start:Number,
@@ -49,6 +51,7 @@ const Sight = new mongoose.model('Sight', sightSchema);
 
 const audioSchema = new mongoose.Schema({
   deviceId : String,
+  control:String,
   audio_effects: [
     {
       start:Number,
@@ -72,6 +75,7 @@ const Audio = new mongoose.model('Audio', audioSchema);
 
 const smellSchema = new mongoose.Schema({
   deviceId : String,
+  control:String,
   smell_effects: [
     {
       start:Number,
@@ -96,6 +100,7 @@ const Smell = new mongoose.model('Smell', smellSchema);
 
 const tasteSchema = new mongoose.Schema({
   deviceId : String,
+  control:String,
   taste_effects: [
     {
       start:Number,

@@ -6,6 +6,7 @@ const app = express()
 const {Device, Effect, Sight, Audio, Haptic, Smell, Taste} = require('./model/model')
 const {exec} =  require('node:child_process');
 const responseTime = require('response-time');
+const fs = require('fs')
 
 
 
@@ -107,6 +108,7 @@ const getDurationInMilliseconds = (time) => {
 app.get('/fans', async(req,res)=>{
     let requestTime = Date.now();
     let start = process.hrtime();
+    console.log(req.body);
     
     Device.findOne({name: req.body.name}, async(err, device) => {
         if (err) throw err
@@ -114,36 +116,58 @@ app.get('/fans', async(req,res)=>{
             console.log('Device is not exists')
             res.send('Device is not exists')
         } else{
-            // if (req.body.status=="On"){
-            //     exec("sudo uhubctl -l 2 -a 1", (error, stdout, stderror) => {
-            //         if (error) {
-            //             console.log(`error: ${error.message}`);
-            //             return;
-            //         }
-            //         if (stderror) {
-            //             console.log(`stderr: ${stderr}`);
-            //             return;
-            //         }
-            //         console.log(`stdout: ${stdout}`);
-            //     })
-            // }
-            // else if (query=="Off"){
-            //     exec("sudo uhubctl -l 2 -a 0", (error, stdout, stderror) => {
-            //         if (error) {
-            //             console.log(`error: ${error.message}`);
-            //             return;
-            //         }
-            //         if (stderror) {
-            //             console.log(`stderr: ${stderr}`);
-            //             return;
-            //         }
-            //         console.log(`stdout: ${stdout}`);
-            //     })
-            // }   
-            let time = getDurationInMilliseconds(start);
+            Haptic.find({control: req.body.status},async(err,effect)=>{
+                if (err) throw err
+                if (effect.length==0){
+                    console.log('This button has no effect yet')
+                    res.status(202).send('This button has no effect yet')
+                }else{
+                    console.log(effect);
+                            // if (req.body.status=="On"){
+                    //     exec("sudo uhubctl -l 2 -a 1", (error, stdout, stderror) => {
+                    //         if (error) {
+                    //             console.log(`error: ${error.message}`);
+                    //             return;
+                    //         }
+                    //         if (stderror) {
+                    //             console.log(`stderr: ${stderr}`);
+                    //             return;
+                    //         }
+                    //         console.log(`stdout: ${stdout}`);
+                    //     })
+                    // }
+                    // else if (query=="Off"){
+                    //     exec("sudo uhubctl -l 2 -a 0", (error, stdout, stderror) => {
+                    //         if (error) {
+                    //             console.log(`error: ${error.message}`);
+                    //             return;
+                    //         }
+                    //         if (stderror) {
+                    //             console.log(`stderr: ${stderr}`);
+                    //             return;
+                    //         }
+                    //         console.log(`stdout: ${stdout}`);
+                    //     })
+                    // }   
+                    let time = getDurationInMilliseconds(start);
+
+                    var effectStr = "";
+                    for (var i=0; i<effect.length; i++){
+                        effectStr += effect[i]._id+',';
+                    }
+                    effectStr = effectStr.substring(0,effectStr.length-1)
+
+                  
+                    
+                    var deploy = fs.createWriteStream("deployRecord.txt", {flags: 'a'})
+                    deploy.write(`${req.body.status} is clicked, effect(s) ${effectStr} is deployed to fan\n`)
+                    
+
             
-            console.log(`Device: ${device.name}, ID: ${device.id} is ${req.body.status}`)
-            res.status(200).send(`Device ID: ${device.id} is ${req.body.status}, time: ${time}, requestTime: ${requestTime}`); 
+                    console.log(`Device: ${device.name}, ID: ${device.id} is ${req.body.status}`)
+                    res.status(200).send(`Device ID: ${device.id} runs ${req.body.status}'s effect(s), time: ${time}, requestTime: ${requestTime}`); 
+                }
+            })
         }
     })    
 });
