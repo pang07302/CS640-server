@@ -9,6 +9,7 @@ const responseTime = require('response-time');
 
 
 
+
 // https://www.freecodecamp.org/news/shell-scripting-crash-course-how-to-write-bash-scripts-in-linux/#:~:text=What%20is%20a%20Bash%20Script%3F,it%20using%20the%20command%20line.
 
 const url = 'mongodb+srv://user:user@cluster0.ts2fe.mongodb.net/myFirstDatabase?retryWrites=true&w=majority'
@@ -30,9 +31,15 @@ app.use(cors({
     optionsSuccessStatus: 200,
     credentials: true
   }));
-  app.use(responseTime((req, res, time) => {
+
+app.use(responseTime((req, res, time) => {
     console.log(`${req.method} ${req.url} ${time}`);
-  }))
+}))
+
+
+
+
+
 
 
 app.use(express.json({limit: '50mb'}))
@@ -90,66 +97,15 @@ app.get('/createEffectTable', async(req,res)=>{
 });
 
 
-
-// add sight effect 
-app.get('/sight/:id', async(req,res)=>{
-    let deviceId = req.params.id;
-    let sight = new Sight(req.body)
-    sight.deviceId = deviceId;
-    await Sight.save();
-    console.log('create data successfully')
-    res.status(200).send(sight)
-});
-
-// add audio effect 
-app.get('/audio/:id', async(req,res)=>{
-    let deviceId = req.params.id;
-    let audio = new Audio(req.body)
-    audio.deviceId = deviceId;
-    await audio.save();
-    console.log('create data successfully')
-    res.status(200).send(audio)
-});
-
-// add haptic effect 
-app.get('/haptic/:id', async(req,res)=>{
-    let deviceId = req.params.id;
-    let haptic = new Haptic(req.body)
-    haptic.deviceId = deviceId;
-    await haptic.save();
-    console.log('create data successfully')
-    res.status(200).send(haptic)
-});
-
-// add haptic effect 
-app.get('/smell/:id', async(req,res)=>{
-    let deviceId = req.params.id;
-    let smell = new Smell(req.body)
-    smell.deviceId = deviceId;
-    await smell.save();
-    console.log('create data successfully')
-    res.status(200).send(smell)
-});
-
-// add taste effect 
-app.get('/taste/:id', async(req,res)=>{
-    let deviceId = req.params.id;
-    let taste = new Taste(req.body)
-    taste.deviceId = deviceId;
-    await taste.save();
-    console.log('create data successfully')
-    res.status(200).send(taste)
-});
-
 const getDurationInMilliseconds = (time) => {
     const diff = process.hrtime(time)
-    return (diff[0] * 1e9 + diff[1]) / 1e9
-    
+    return (diff[0] * 1e9 + diff[1]) / 1e6
 }
 
 
 // check whether the default table contains the device
 app.get('/fans', async(req,res)=>{
+    let requestTime = Date.now();
     let start = process.hrtime();
     
     Device.findOne({name: req.body.name}, async(err, device) => {
@@ -187,7 +143,7 @@ app.get('/fans', async(req,res)=>{
             let time = getDurationInMilliseconds(start);
             
             console.log(`Device: ${device.name}, ID: ${device.id} is ${req.body.status}`)
-            res.status(200).send(`Device ID: ${device.id} is ${req.body.status}, time: ${time}`); 
+            res.status(200).send(`Device ID: ${device.id} is ${req.body.status}, time: ${time}, requestTime: ${requestTime}`); 
         }
     })    
 });
@@ -202,11 +158,6 @@ app.get('/customDevice', async(req,res)=>{
             console.log('Device is already exists')
             res.send('Device is already exists')
         } else{
-            
-       
-            // console.log(len);
-            
-
             let device = new Device({name:req.body.name, id:len+1});
             console.log(device);
             device.save();
