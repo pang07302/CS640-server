@@ -7,6 +7,8 @@ const {Device, Effect, Sight, Audio, Haptic, Smell, Taste} = require('./model/mo
 const {exec} =  require('node:child_process');
 const responseTime = require('response-time');
 const fs = require('fs')
+const now = require('nano-time');
+
 
 
 
@@ -98,15 +100,16 @@ app.get('/createEffectTable', async(req,res)=>{
 });
 
 
-const getDurationInMilliseconds = (time) => {
+const getDuration = (time) => {
     const diff = process.hrtime(time)
-    return (diff[0] * 1e9 + diff[1]) / 1e6
+    return (diff[0] * 1e9 + diff[1]) 
 }
 
 
 // check whether the default table contains the device
 app.get('/fans', async(req,res)=>{
-    let requestTime = Date.now();
+    let requestTime = now();
+    console.log(requestTime)
     let start = process.hrtime();
     console.log(req.body);
     
@@ -123,7 +126,36 @@ app.get('/fans', async(req,res)=>{
                     res.status(202).send('This button has no effect yet')
                 }else{
                     console.log(effect);
-                            // if (req.body.status=="On"){
+                    switch (req.body.status){
+                        case 'btn_1','btn_2','btn_3':
+                        exec("sudo uhubctl -l 2 -a 1", (error, stdout, stderror) => {
+                            if (error) {
+                                console.log(`error: ${error.message}`);
+                                return;
+                            }
+                            if (stderror) {
+                                console.log(`stderr: ${stderr}`);
+                                return;
+                            }
+                            console.log(`stdout: ${stdout}`);
+                        })
+                            
+                            break;
+                        case 'btn_off':
+                        exec("sudo uhubctl -l 2 -a 0", (error, stdout, stderror) => {
+                            if (error) {
+                                console.log(`error: ${error.message}`);
+                                return;
+                            }
+                            if (stderror) {
+                                console.log(`stderr: ${stderr}`);
+                                return;
+                            }
+                            console.log(`stdout: ${stdout}`);
+                        })
+                            break;
+                    }
+                    // if (req.body.status=="On"){
                     //     exec("sudo uhubctl -l 2 -a 1", (error, stdout, stderror) => {
                     //         if (error) {
                     //             console.log(`error: ${error.message}`);
@@ -149,7 +181,7 @@ app.get('/fans', async(req,res)=>{
                     //         console.log(`stdout: ${stdout}`);
                     //     })
                     // }   
-                    let time = getDurationInMilliseconds(start);
+                    let time = getDuration(start);
 
                     var effectStr = "";
                     for (var i=0; i<effect.length; i++){
