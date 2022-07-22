@@ -125,6 +125,7 @@ app.get('/fans', async(req,res)=>{
                     console.log(req.body.status);
                     switch (req.body.status){
                         case 'btn_1','btn_2','btn_3':
+                            console.log("hahahahaha")
                         exec("sudo uhubctl -l 2 -a 1", (error, stdout, stderror) => {
                             if (error) {
                                 console.log(`error: ${error.message}`);
