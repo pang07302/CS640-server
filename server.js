@@ -142,6 +142,7 @@ app.get('/fans', async(req,res)=>{
                             
                             break;
                         case 'btn_off':
+                            console.log("btnoff")
                         exec("sudo uhubctl -l 2 -a 0", (error, stdout, stderror) => {
                             if (error) {
                                 console.log(`error: ${error.message}`);
