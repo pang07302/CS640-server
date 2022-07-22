@@ -100,16 +100,13 @@ app.get('/createEffectTable', async(req,res)=>{
 });
 
 
-const getDuration = (time) => {
-    const diff = process.hrtime(time)
-    return (diff[0] * 1e9 + diff[1]) 
-}
+
 
 
 // check whether the default table contains the device
 app.get('/fans', async(req,res)=>{
     let requestTime = now();
-    let start = process.hrtime();
+    let start = process.hrtime.bigint();
     
     
     Device.findOne({name: req.body.name}, async(err, device) => {
@@ -182,7 +179,7 @@ app.get('/fans', async(req,res)=>{
                     //         console.log(`stdout: ${stdout}`);
                     //     })
                     // }   
-                    let time = getDuration(start);
+                    let time = process.hrtime.bigint()-start;
 
                     var effectStr = "";
                     for (var i=0; i<effect.length; i++){

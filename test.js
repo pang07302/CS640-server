@@ -99,3 +99,9 @@ app.get('/taste/:id', async(req,res)=>{
     console.log('create data successfully')
     res.status(200).send(taste)
 });
+
+
+const getDuration = (time) => {
+    const diff = process.hrtime(time)
+    return (diff[0] * 1e9 + diff[1]) 
+}
