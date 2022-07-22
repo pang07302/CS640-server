@@ -109,9 +109,8 @@ const getDuration = (time) => {
 // check whether the default table contains the device
 app.get('/fans', async(req,res)=>{
     let requestTime = now();
-    console.log(requestTime)
     let start = process.hrtime();
-    console.log(req.body);
+    
     
     Device.findOne({name: req.body.name}, async(err, device) => {
         if (err) throw err
@@ -126,6 +125,7 @@ app.get('/fans', async(req,res)=>{
                     res.status(202).send('This button has no effect yet')
                 }else{
                     console.log(effect);
+                    console.log(req.body.status);
                     switch (req.body.status){
                         case 'btn_1','btn_2','btn_3':
                         exec("sudo uhubctl -l 2 -a 1", (error, stdout, stderror) => {
