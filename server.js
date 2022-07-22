@@ -123,64 +123,9 @@ app.get('/fans', async(req,res)=>{
                 }else{
                     console.log(effect);
                     console.log(req.body.status);
-                    switch (req.body.status){
-                        case 'btn_1': case'btn_2': case'btn_3':
-                        
-                        exec("sudo uhubctl -l 2 -a 1", (error, stdout, stderror) => {
-                            if (error) {
-                                console.log(`error: ${error.message}`);
-                                return;
-                            }
-                            if (stderror) {
-                                console.log(`stderr: ${stderr}`);
-                                return;
-                            }
-                            console.log(`stdout: ${stdout}`);
-                        })
-                            
-                            break;
-                        case 'btn_off':
-                            console.log("btnoff")
-                        exec("sudo uhubctl -l 2 -a 0", (error, stdout, stderror) => {
-                            if (error) {
-                                console.log(`error: ${error.message}`);
-                                return;
-                            }
-                            if (stderror) {
-                                console.log(`stderr: ${stderr}`);
-                                return;
-                            }
-                            console.log(`stdout: ${stdout}`);
-                        })
-                            break;
-                    }
-                    // if (req.body.status=="On"){
-                    //     exec("sudo uhubctl -l 2 -a 1", (error, stdout, stderror) => {
-                    //         if (error) {
-                    //             console.log(`error: ${error.message}`);
-                    //             return;
-                    //         }
-                    //         if (stderror) {
-                    //             console.log(`stderr: ${stderr}`);
-                    //             return;
-                    //         }
-                    //         console.log(`stdout: ${stdout}`);
-                    //     })
-                    // }
-                    // else if (query=="Off"){
-                    //     exec("sudo uhubctl -l 2 -a 0", (error, stdout, stderror) => {
-                    //         if (error) {
-                    //             console.log(`error: ${error.message}`);
-                    //             return;
-                    //         }
-                    //         if (stderror) {
-                    //             console.log(`stderr: ${stderr}`);
-                    //             return;
-                    //         }
-                    //         console.log(`stdout: ${stdout}`);
-                    //     })
-                    // }   
-                    let time = process.hrtime.bigint()-start;
+                    
+                    await runBashScript(req.body.status);
+                    let processingTime = process.hrtime.bigint()-start;
 
                     var effectStr = "";
                     for (var i=0; i<effect.length; i++){
@@ -188,20 +133,52 @@ app.get('/fans', async(req,res)=>{
                     }
                     effectStr = effectStr.substring(0,effectStr.length-1)
 
-                  
-                    
                     var deploy = fs.createWriteStream("deployRecord.txt", {flags: 'a'})
                     deploy.write(`${req.body.status} is clicked, effect(s) ${effectStr} is deployed to fan\n`)
-                    
-
-            
+                     
+                    let sendBackTime = now();
                     console.log(`Device: ${device.name}, ID: ${device.id} is ${req.body.status}`)
-                    res.status(200).send(`Device ID: ${device.id} runs ${req.body.status}'s effect(s), time: ${time}, requestTime: ${requestTime}`); 
+                    res.status(200).send(`Device ID: ${device.id} runs ${req.body.status}'s effect(s), processing time: ${processingTime}, receieved request: ${requestTime}, send back: ${sendBackTime}`); 
                 }
             })
         }
     })    
 });
+
+function runBashScript(status){
+    switch (status){
+        case 'btn_1': case'btn_2': case'btn_3':
+        
+        exec("sudo uhubctl -l 2 -a 1", (error, stdout, stderror) => {
+            if (error) {
+                console.log(`error: ${error.message}`);
+                return;
+            }
+            if (stderror) {
+                console.log(`stderr: ${stderr}`);
+                return;
+            }
+            console.log(`stdout: ${stdout}`);
+        })
+            
+            break;
+        case 'btn_off':
+            console.log("btnoff")
+        exec("sudo uhubctl -l 2 -a 0", (error, stdout, stderror) => {
+            if (error) {
+                console.log(`error: ${error.message}`);
+                return;
+            }
+            if (stderror) {
+                console.log(`stderr: ${stderr}`);
+                return;
+            }
+            console.log(`stdout: ${stdout}`);
+        })
+            break;
+    }
+
+}
 
 app.get('/customDevice', async(req,res)=>{
     console.log(req.body);
