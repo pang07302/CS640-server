@@ -200,35 +200,70 @@ app.get('/customDevice', async(req,res)=>{
 });
 
 // get haptic effects id
-app.get('/getDeviceEffectsId/:id', async(req,res)=>{
-    let id = req.params.id.split('(')[0];
-    let category = req.params.id.split('(')[1].substring(0,req.params.id.split('(')[1].length-1);
-    let collection;
-    switch (category){
-        case "Sight": collection = Sight; break;
-        case "Audio": collection = Audio; break;
-        case "Haptic": collection = Haptic; break;
-        case "Smell": collection = Smell; break;
-        case "Taste": collection = Taste; break;
-    }
+app.get('/getDeviceEffectsId/:device', async(req,res)=>{
+
+    let device = await Device.find({name:req.params.device});
+
+    let category = device.category;
     let effectId = [];
-    
-    collection.find({deviceId: id}, async(err, effect) => {
-        if (err) throw err
-        if (!effect){
-            console.log('Device has no effect yet')
-            res.send('Device has no effect yet')
-        } else{
-            
-            for (var i =0; i<effect.length; i++){
-                effectId.push(effect[i]._id);
-               
+    switch (category){
+        case category.includes("Sight"):
+            let effect = await Sight.find({deviceId: device}); 
+            if (effect){ 
+                for (var i =0; i<effect.length; i++){
+                    effectId.push(effect[i]._id);
+                }
             }
-            console.log(effectId);
-            res.status(200).send(effectId); 
-        }
-    })    
+        case category.includes("Audio"):
+            effect = await Audio.find({deviceId: device}); 
+            if (effect){ 
+                for (var i =0; i<effect.length; i++){
+                    effectId.push(effect[i]._id);
+                }
+            }
+        case category.includes("Haptic"): 
+            effect = await Haptic.find({deviceId: device}); 
+            if (effect){ 
+                for (var i =0; i<effect.length; i++){
+                    effectId.push(effect[i]._id);
+                }
+            } 
+        case category.includes("Smell"): 
+            effect = await Smell.find({deviceId: device}); 
+            if (effect){ 
+                for (var i =0; i<effect.length; i++){
+                    effectId.push(effect[i]._id);
+                }
+            }
+        case category.includes("Taste"): 
+            effect = await Taste.find({deviceId: device}); 
+            if (effect){ 
+                for (var i =0; i<effect.length; i++){
+                    effectId.push(effect[i]._id);
+                }
+            }
+    }
+        console.log(effectId);
+        res.status(200).send(effectId); 
 })
+
+    
+    // collection.find({deviceId: device}, async(err, effect) => {
+    //     if (err) throw err
+    //     if (!effect){
+    //         console.log('Device has no effect yet')
+    //         res.send('Device has no effect yet')
+    //     } else{
+            
+    //         for (var i =0; i<effect.length; i++){
+    //             effectId.push(effect[i]._id);
+               
+    //         }
+    //         console.log(effectId);
+    //         res.status(200).send(effectId); 
+    //     }
+    // })    
+
 
 app.get('/getDeviceEffect/:req', async(req,res)=>{
     console.log(req.params.req);
