@@ -199,7 +199,7 @@ app.get('/customDevice', async(req,res)=>{
     })    
 });
 
-// get haptic effects id
+// get effects id
 app.get('/getDeviceEffectsId/:device', async(req,res)=>{
 
     let device = await Device.find({name:req.params.device});
