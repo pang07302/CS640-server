@@ -211,6 +211,7 @@ app.get('/getDeviceEffectsId/:device', async(req,res)=>{
     else{
 
         let category = device.category;
+        console.log(category);
         let effectId = [];
         let effect;
         if (category.includes("Sight"))
