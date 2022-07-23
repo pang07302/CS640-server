@@ -203,11 +203,16 @@ app.get('/customDevice', async(req,res)=>{
 app.get('/getDeviceEffectsId/:device', async(req,res)=>{
 
     let device = await Device.find({name:req.params.device});
+    if (!device){
+        console.log('This device has not save in the table yet')
+        res.send('This device has not save in the table yet')
 
-    let category = device.category;
-    let effectId = [];
-    let effect;
+    }
+    else{
 
+        let category = device.category;
+        let effectId = [];
+        let effect;
         if (category.includes("Sight"))
             effect = await Sight.find({deviceId: device}); 
             if (effect){ 
@@ -245,7 +250,8 @@ app.get('/getDeviceEffectsId/:device', async(req,res)=>{
             }
     
         console.log(effectId);
-        res.status(200).send(effectId); 
+        res.status(200).send(effectId);
+    } 
 })
 
     
