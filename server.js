@@ -103,7 +103,7 @@ app.get('/createEffectTable', async(req,res)=>{
 
 
 
-// check whether the default table contains the device
+// check whether the default table contains the device and deploy 
 app.get('/fans', async(req,res)=>{
     let requestTime = now();
     let start = process.hrtime.bigint();
@@ -177,7 +177,6 @@ function runBashScript(status){
         })
             break;
     }
-
 }
 
 app.get('/customDevice', async(req,res)=>{
@@ -190,7 +189,7 @@ app.get('/customDevice', async(req,res)=>{
             console.log('Device is already exists')
             res.send('Device is already exists')
         } else{
-            let device = new Device({name:req.body.name, id:len+1});
+            let device = new Device({name:req.body.name, category:req.body.category, id:len+1});
             console.log(device);
             device.save();
             

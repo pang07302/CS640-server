@@ -170,7 +170,8 @@ const Taste = new mongoose.model('Taste', tasteSchema);
 
 const deviceSchema = new mongoose.Schema({
   id: { type: Number},
-  name: { type: String}
+  name: { type: String},
+  category: { type: String},
 })  
 const Device = new mongoose.model('Device', deviceSchema);
 
