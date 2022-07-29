@@ -5,18 +5,12 @@ const PORT = process.env.port || 8000
 const app = express()
 const {Device, Effect, Sight, Audio, Haptic, Smell, Taste} = require('./model/model')
 const {exec} =  require('node:child_process');
-const responseTime = require('response-time');
+
 const fs = require('fs')
 const now = require('nano-time');
 
 
-
-
-
-// https://www.freecodecamp.org/news/shell-scripting-crash-course-how-to-write-bash-scripts-in-linux/#:~:text=What%20is%20a%20Bash%20Script%3F,it%20using%20the%20command%20line.
-
 const url = 'mongodb+srv://user:user@cluster0.ts2fe.mongodb.net/myFirstDatabase?retryWrites=true&w=majority'
-
 
 mongoose.connect(url, {
     useNewUrlParser: true,
@@ -26,7 +20,7 @@ mongoose.connect(url, {
     console.log('Connected to database')
 }).catch(err => console.log(err))
 
-// https://stackoverflow.com/questions/19743396/cors-cannot-use-wildcard-in-access-control-allow-origin-when-credentials-flag-i
+
 app.use(cors({
     origin: function(origin, callback){
       return callback(null, true);
@@ -35,10 +29,10 @@ app.use(cors({
     credentials: true
   }));
 
-app.use(responseTime((req, res, time) => {
-    console.log(`${req.method} ${req.url} ${time}`);
-}))
 
+
+// https://www.freecodecamp.org/news/shell-scripting-crash-course-how-to-write-bash-scripts-in-linux/#:~:text=What%20is%20a%20Bash%20Script%3F,it%20using%20the%20command%20line.
+// https://stackoverflow.com/questions/19743396/cors-cannot-use-wildcard-in-access-control-allow-origin-when-credentials-flag-i
 
 
 
@@ -52,19 +46,9 @@ app.use(express.urlencoded({ extended: true, limit: '50mb'}))
 app.listen(PORT, () => {
     console.log(`Server listening or port ${PORT}`)
 })
-// test
-app.get("/url", (req, res, next) => {
-    res.json(["Tony","Lisa","Liam","Ginseng","Fruit"]);
-   });
-
-
-app.get('/createDefaultTable', async(req,res)=>{
-    console.log(req.body)
-});
 
 // create the default device table
 app.get('/createDeviceTable', async(req,res)=>{
-    console.log(req.body.device)
     Device.findOne({name: req.body.device[0].name}, async(err, result) => {
         if (err) throw err
         if (result){
@@ -73,13 +57,14 @@ app.get('/createDeviceTable', async(req,res)=>{
         }else{
             for (var i=0; i<req.body.device.length; i++){
                 let device = new Device(req.body.device[i])
-                console.log(device);
                 await device.save()
             } 
-            res.status(200).send('create data successfully')
+            res.send('create data successfully')
         }
     })  
 });
+
+
 // create the default effect table
 app.get('/createEffectTable', async(req,res)=>{
     console.log(req.body)
@@ -94,7 +79,7 @@ app.get('/createEffectTable', async(req,res)=>{
                 console.log(effect);
                 await effect.save()
             } 
-            res.status(200).send('create data successfully')
+            res.send('create data successfully')
         }
     })  
 });
@@ -106,24 +91,17 @@ app.get('/createEffectTable', async(req,res)=>{
 // check whether the default table contains the device and deploy 
 app.get('/fans', async(req,res)=>{
     let requestTime = now();
-    let start = process.hrtime.bigint();
-    
-    
+    let start = process.hrtime.bigint();    
     Device.findOne({name: req.body.name}, async(err, device) => {
         if (err) throw err
         if (!device){
-            console.log('Device is not exists')
             res.send('Device is not exists')
         } else{
             Haptic.find({control: req.body.status},async(err,effect)=>{
                 if (err) throw err
                 if (effect.length==0){
-                    console.log('This button has no effect yet')
                     res.status(202).send('This button has no effect yet')
                 }else{
-                    console.log(effect);
-                    console.log(req.body.status);
-                    
                     await runBashScript(req.body.status);
                     let processingTime = process.hrtime.bigint()-start;
 
@@ -132,18 +110,19 @@ app.get('/fans', async(req,res)=>{
                         effectStr += effect[i]._id+',';
                     }
                     effectStr = effectStr.substring(0,effectStr.length-1)
-
                     var deploy = fs.createWriteStream("deployRecord.txt", {flags: 'a'})
                     deploy.write(`${req.body.status} is clicked, effect(s) ${effectStr} is deployed to fan\n`)
-                     
-                    let sendBackTime = now();
-                    console.log(`Device: ${device.name}, ID: ${device.id} is ${req.body.status}`)
-                    res.status(200).send(`Device ID: ${device.id} runs ${req.body.status}'s effect(s), processing time: ${processingTime}, receieved request: ${requestTime}, send back: ${sendBackTime}`); 
+                    let sendBackTime = await now();
+                    res.status(200).send(`Device ID: ${device.id} runs ${req.body.status}'s effect(s), 
+                    processing time: ${processingTime}, receieved request: ${requestTime}, send back: ${sendBackTime}`); 
                 }
             })
         }
     })    
 });
+
+// console.log("sendBackTime:",sendBackTime)
+//                     console.log(`Device: ${device.name}, ID: ${device.id} is ${req.body.status}`)
 
 function runBashScript(status){
     switch (status){
@@ -180,98 +159,77 @@ function runBashScript(status){
 }
 
 app.get('/customDevice', async(req,res)=>{
-    console.log(req.body);
     let len = await Device.count()
-    // console.log(len)
     Device.findOne({name: req.body.name}, async(err, device) => {
         if (err) throw err
         if (device){
-            console.log('Device is already exists')
             res.send('Device is already exists')
         } else{
             let device = new Device({name:req.body.name, category:req.body.category, id:len+1});
-            console.log(device);
             device.save();
-            
-            console.log(`Device: ${device.name}, ID: ${device.id} is ${req.body.status}`)
             res.status(200).send(`Device ID: ${device.name} is added `); 
         }
     })    
 });
 
 // get effects id
-app.get('/getDeviceEffectsId/:device', async(req,res)=>{
-
-    let device = await Device.find({name:req.params.device});
+app.get('/getDeviceEffectsId/:device', async(req,res)=>{ 
+    let device = await Device.findOne({name:req.params.device});
     if (!device){
-        console.log('This device has not save in the table yet')
         res.send('This device has not save in the table yet')
-
     }
     else{
-
+        console.log(device)
         let category = device.category;
-        console.log(category);
         let effectId = [];
-        let effect;
-        if (category.includes("Sight"))
-            effect = await Sight.find({deviceId: device}); 
-            if (effect){ 
+        if (category.includes("Sight")){
+            let effect = await Sight.find({deviceId: req.params.device})
+            if (effect){
                 for (var i =0; i<effect.length; i++){
-                    effectId.push(effect[i]._id);
+                    effectId.push(effect[i]._id+"_Sight");
                 }
             }
-        if (category.includes("Audio"))
-            effect = await Audio.find({deviceId: device}); 
-            if (effect){ 
+        }
+        if (category.includes("Audio")){
+            let effect = await Audio.find({deviceId: req.params.device})
+            if (effect){
                 for (var i =0; i<effect.length; i++){
-                    effectId.push(effect[i]._id);
+                    effectId.push(effect[i]._id+"_Audio");
                 }
             }
-        if (category.includes("Haptic")) 
-            effect = await Haptic.find({deviceId: device}); 
-            if (effect){ 
+        }
+        if (category.includes("Haptic")) {
+            let effect = await Haptic.find({deviceId: req.params.device})
+            if (effect){
                 for (var i =0; i<effect.length; i++){
-                    effectId.push(effect[i]._id);
-                }
-            } 
-        if (category.includes("Smell"))
-            effect = await Smell.find({deviceId: device}); 
-            if (effect){ 
-                for (var i =0; i<effect.length; i++){
-                    effectId.push(effect[i]._id);
+                    effectId.push(effect[i]._id+"_Haptic");
                 }
             }
-        if(category.includes("Taste"))
-            effect = await Taste.find({deviceId: device}); 
-            if (effect){ 
+        }
+        if (category.includes("Smell")){
+            let effect = await Smell.find({deviceId: req.params.device})
+            if (effect){
                 for (var i =0; i<effect.length; i++){
-                    effectId.push(effect[i]._id);
+                    effectId.push(effect[i]._id+"_Smell");
                 }
             }
-    
-        console.log(effectId);
-        res.status(200).send(effectId);
+        }    
+        if(category.includes("Taste")){
+            let effect = await Taste.find({deviceId: req.params.device})
+            if (effect){
+                for (var i =0; i<effect.length; i++){
+                    effectId.push(effect[i]._id+"_Taste");
+                }
+            }
+        }    
+        if (effectId.length===0){
+            res.status(202).send('Device has no effect yet')
+        } else {
+            effectId.push('|'+category)
+            res.status(200).send(effectId);
+        }   
     } 
 })
-
-    
-    // collection.find({deviceId: device}, async(err, effect) => {
-    //     if (err) throw err
-    //     if (!effect){
-    //         console.log('Device has no effect yet')
-    //         res.send('Device has no effect yet')
-    //     } else{
-            
-    //         for (var i =0; i<effect.length; i++){
-    //             effectId.push(effect[i]._id);
-               
-    //         }
-    //         console.log(effectId);
-    //         res.status(200).send(effectId); 
-    //     }
-    // })    
-
 
 app.get('/getDeviceEffect/:req', async(req,res)=>{
     console.log(req.params.req);
@@ -288,148 +246,121 @@ app.get('/getDeviceEffect/:req', async(req,res)=>{
     collection.findOne({_id: id}, async(err, effect) => {
         if (err) throw err
         if (!effect){
-            console.log('Effect dose not exist')
             res.send('Effect does not exist')
         } else{
-            console.log(effect);
             res.status(200).send(effect); 
         }
     })    
 })
-
 app.get('/CreateEffect/:deviceId', async(req,res) => {
-    
-    let category = Object.keys(req.body)[0];
+    let category = req.body.category
     let collection;
     switch (category){
-        case "sight_effects": collection = Sight; break;
-        case "audio_effects": collection = Audio; break;
-        case "haptic_effects": collection = Haptic; break;
-        case "smell_effects": collection = Smell; break;
-        case "taste_effects": collection = Taste; break;
+        case "Sight": collection = Sight; break;
+        case "Audio": collection = Audio; break;
+        case "Haptic": collection = Haptic; break;
+        case "Smell": collection = Smell; break;
+        case "Taste": collection = Taste; break;
     }
     let effect = new collection(req.body)
     effect.deviceId = req.params.deviceId;
     await effect.save();
-    console.log('create data successfully')
     res.status(200).send(effect)
 })
 
+
+
+async function remove(id, previousCategory){
+    switch (previousCategory){
+        case "Sight":
+            await Sight.findByIdAndRemove(id)
+            break    
+        case "Audio":
+            await Audio.findByIdAndRemove(id)
+            break  
+        case "Haptic":
+            await Haptic.findByIdAndRemove(id)
+            break  
+        case "Smell":
+            await Smell.findByIdAndRemove(id)
+            break  
+        case "Taste":
+            await Taste.findByIdAndRemove(id)
+            break  
+    }
+}
+function setEffect(effect, req){
+    effect.deviceId=req.body.deviceId;
+    effect.category=req.body.category;
+    effect.control=req.body.control;
+    effect.description.properties.type = req.body.description.properties.type;
+    effect.description.properties.measure = req.body.description.properties.measure; 
+    effect.description.properties.unit = req.body.description.properties.unit;
+    effect.description.properties.quantity = req.body.description.properties.quantity;
+    effect.description.pattern.type = req.body.description.pattern.type;
+    effect.description.pattern.LengthMs = req.body.description.pattern.LengthMs;
+}
+
+
 app.get('/ManageEffect/:effectId', async(req,res) => {
-    let category = Object.keys(req.body)[0];
-    console.log(req.params.effectId)
+    let category = req.body.category;
+    let id = req.params.effectId.split('_')[0]
+    let previousCategory = req.params.effectId.split('_')[1]
     let effect;
     switch (category){
-        case "sight_effects":
-            effect = await Sight.findById(req.params.effectId)
-            effect.sight_effects[0].start = req.body.sight_effects[0].start;
-            effect.sight_effects[1].start = req.body.sight_effects[1].start;
-            effect.sight_effects[2].start = req.body.sight_effects[2].start;
-            effect.sight_effects[3].start = req.body.sight_effects[3].start;
-            effect.sight_effects[0].description.pattern[0].type = req.body.sight_effects[0].description.pattern[0].type
-            effect.sight_effects[1].description.pattern[0].type = req.body.sight_effects[1].description.pattern[0].type
-            effect.sight_effects[2].description.pattern[0].type = req.body.sight_effects[2].description.pattern[0].type
-            effect.sight_effects[3].description.pattern[0].type = req.body.sight_effects[3].description.pattern[0].type
-            effect.sight_effects[0].description.pattern[0].LengthMs = req.body.sight_effects[0].description.pattern[0].LengthMs 
-            effect.sight_effects[1].description.pattern[0].LengthMs = req.body.sight_effects[1].description.pattern[0].LengthMs 
-            effect.sight_effects[2].description.pattern[0].LengthMs = req.body.sight_effects[2].description.pattern[0].LengthMs 
-            effect.sight_effects[3].description.pattern[0].LengthMs = req.body.sight_effects[3].description.pattern[0].LengthMs 
-            effect.sight_effects[0].description.rate.frequency = req.body.sight_effects[0].description.rate.frequency
-            effect.sight_effects[1].description.rate.frequency = req.body.sight_effects[1].description.rate.frequency
-            effect.sight_effects[2].description.rate.frequency = req.body.sight_effects[2].description.rate.frequency
-            effect.sight_effects[3].description.rate.frequency = req.body.sight_effects[3].description.rate.frequency
-            effect.sight_effects[0].description.pattern[0].colour = req.body.sight_effects[0].description.pattern[0].colour 
-            effect.sight_effects[1].description.pattern[0].colour = req.body.sight_effects[1].description.pattern[0].colour 
-            effect.sight_effects[2].description.pattern[0].colour = req.body.sight_effects[2].description.pattern[0].colour 
-            effect.sight_effects[3].description.pattern[0].colour = req.body.sight_effects[3].description.pattern[0].colour 
+        case "Sight":
+            effect = await Sight.findById(id)
+            if (!effect){
+                effect = new Sight(req.body);
+                effect.deviceId=req.body.deviceId;
+                remove(id, previousCategory)
+            }else{
+                setEffect(effect,req);
+                effect.description.properties.id = req.body.description.properties.id;
+            }
             break;
-        case "audio_effects": 
-            effect = await Audio.findById(req.params.effectId)
-            effect.audio_effects[0].start = req.body.audio_effects[0].start;
-            effect.audio_effects[1].start = req.body.audio_effects[1].start;
-            effect.audio_effects[2].start = req.body.audio_effects[2].start;
-            effect.audio_effects[3].start = req.body.audio_effects[3].start;
-            effect.audio_effects[0].description.pattern[0].type = req.body.audio_effects[0].description.pattern[0].type
-            effect.audio_effects[1].description.pattern[0].type = req.body.audio_effects[1].description.pattern[0].type
-            effect.audio_effects[2].description.pattern[0].type = req.body.audio_effects[2].description.pattern[0].type
-            effect.audio_effects[3].description.pattern[0].type = req.body.audio_effects[3].description.pattern[0].type
-            effect.audio_effects[0].description.pattern[0].LengthMs = req.body.audio_effects[0].description.pattern[0].LengthMs 
-            effect.audio_effects[1].description.pattern[0].LengthMs = req.body.audio_effects[1].description.pattern[0].LengthMs 
-            effect.audio_effects[2].description.pattern[0].LengthMs = req.body.audio_effects[2].description.pattern[0].LengthMs 
-            effect.audio_effects[3].description.pattern[0].LengthMs = req.body.audio_effects[3].description.pattern[0].LengthMs 
-            effect.audio_effects[0].description.rate.frequency = req.body.audio_effects[0].description.rate.frequency
-            effect.audio_effects[1].description.rate.frequency = req.body.audio_effects[1].description.rate.frequency
-            effect.audio_effects[2].description.rate.frequency = req.body.audio_effects[2].description.rate.frequency
-            effect.audio_effects[3].description.rate.frequency = req.body.audio_effects[3].description.rate.frequency
+        case "Audio": 
+            effect = await Audio.findById(id)
+            if (!effect){
+                effect = new Audio(req.body);
+                effect.deviceId=req.body.deviceId;
+                remove(id, previousCategory)
+            }else{
+                setEffect(effect,req); 
+            }    
             break;
-        case "haptic_effects": 
-            effect = await Haptic.findById(req.params.effectId)
-            effect.haptic_effects[0].start = req.body.haptic_effects[0].start;
-            effect.haptic_effects[1].start = req.body.haptic_effects[1].start;
-            effect.haptic_effects[2].start = req.body.haptic_effects[2].start;
-            effect.haptic_effects[3].start = req.body.haptic_effects[3].start;
-            effect.haptic_effects[0].description.pattern[0].type = req.body.haptic_effects[0].description.pattern[0].type
-            effect.haptic_effects[1].description.pattern[0].type = req.body.haptic_effects[1].description.pattern[0].type
-            effect.haptic_effects[2].description.pattern[0].type = req.body.haptic_effects[2].description.pattern[0].type
-            effect.haptic_effects[3].description.pattern[0].type = req.body.haptic_effects[3].description.pattern[0].type
-            effect.haptic_effects[0].description.pattern[0].LengthMs = req.body.haptic_effects[0].description.pattern[0].LengthMs 
-            effect.haptic_effects[1].description.pattern[0].LengthMs  = req.body.haptic_effects[1].description.pattern[0].LengthMs 
-            effect.haptic_effects[2].description.pattern[0].LengthMs  = req.body.haptic_effects[2].description.pattern[0].LengthMs 
-            effect.haptic_effects[3].description.pattern[0].LengthMs  = req.body.haptic_effects[3].description.pattern[0].LengthMs 
-            effect.haptic_effects[0].description.rate.frequency = req.body.haptic_effects[0].description.rate.frequency
-            effect.haptic_effects[1].description.rate.frequency = req.body.haptic_effects[1].description.rate.frequency
-            effect.haptic_effects[2].description.rate.frequency = req.body.haptic_effects[2].description.rate.frequency
-            effect.haptic_effects[3].description.rate.frequency = req.body.haptic_effects[3].description.rate.frequency
+        case "Haptic":
+            effect = await Haptic.findById(id)
+            if (!effect){
+                effect = new Haptic(req.body);
+                effect.deviceId=req.body.deviceId;
+                remove(id, previousCategory)
+            }else{
+                setEffect(effect,req);
+            }
             break;
-        case "smell_effects": 
-            effect = await Smell.findById(req.params.effectId)
-            effect.smell_effects[0].start = req.body.smell_effects[0].start;
-            effect.smell_effects[1].start = req.body.smell_effects[1].start;
-            effect.smell_effects[2].start = req.body.smell_effects[2].start;
-            effect.smell_effects[3].start = req.body.smell_effects[3].start;
-            effect.smell_effects[0].description.pattern[0].type = req.body.smell_effects[0].description.pattern[0].type
-            effect.smell_effects[1].description.pattern[0].type = req.body.smell_effects[1].description.pattern[0].type
-            effect.smell_effects[2].description.pattern[0].type = req.body.smell_effects[2].description.pattern[0].type
-            effect.smell_effects[3].description.pattern[0].type = req.body.smell_effects[3].description.pattern[0].type
-            effect.smell_effects[0].description.pattern[0].LengthMs = req.body.smell_effects[0].description.pattern[0].LengthMs 
-            effect.smell_effects[1].description.pattern[0].LengthMs = req.body.smell_effects[1].description.pattern[0].LengthMs 
-            effect.smell_effects[2].description.pattern[0].LengthMs = req.body.smell_effects[2].description.pattern[0].LengthMs 
-            effect.smell_effects[3].description.pattern[0].LengthMs = req.body.smell_effects[3].description.pattern[0].LengthMs 
-            effect.smell_effects[0].description.rate.frequency = req.body.audio_effects[0].description.rate.frequency
-            effect.smell_effects[1].description.rate.frequency = req.body.audio_effects[1].description.rate.frequency
-            effect.smell_effects[2].description.rate.frequency = req.body.audio_effects[2].description.rate.frequency
-            effect.smell_effects[3].description.rate.frequency = req.body.audio_effects[3].description.rate.frequency
-            effect.smell_effects[0].description.pattern[0].fragrance = req.body.smell_effects[0].description.pattern[0].fragrance 
-            effect.smell_effects[1].description.pattern[0].fragrance = req.body.smell_effects[1].description.pattern[0].fragrance 
-            effect.smell_effects[2].description.pattern[0].fragrance = req.body.smell_effects[2].description.pattern[0].fragrance 
-            effect.smell_effects[3].description.pattern[0].fragrance = req.body.smell_effects[3].description.pattern[0].fragrance 
+        case "Smell": 
+            effect = await Smell.findById(id)
+            if (!effect){
+                effect = new Smell(req.body);
+                effect.deviceId=req.body.deviceId;
+                remove(id, previousCategory)
+            }else{
+                setEffect(effect,req);
+            }
             break;
-        case "taste_effects":
-            effect = await Taste.findById(req.params.effectId)
-            effect.taste_effects[0].start = req.body.taste_effects[0].start;
-            effect.taste_effects[1].start = req.body.taste_effects[1].start;
-            effect.taste_effects[2].start = req.body.taste_effects[2].start;
-            effect.taste_effects[3].start = req.body.taste_effects[3].start;
-            effect.taste_effects[0].description.pattern[0].type = req.body.taste_effects[0].description.pattern[0].type
-            effect.taste_effects[1].description.pattern[0].type = req.body.taste_effects[1].description.pattern[0].type
-            effect.taste_effects[2].description.pattern[0].type = req.body.taste_effects[2].description.pattern[0].type
-            effect.taste_effects[3].description.pattern[0].type = req.body.taste_effects[3].description.pattern[0].type
-            effect.taste_effects[0].description.pattern[0].LengthMs = req.body.taste_effects[0].description.pattern[0].LengthMs 
-            effect.taste_effects[1].description.pattern[0].LengthMs = req.body.taste_effects[1].description.pattern[0].LengthMs 
-            effect.taste_effects[2].description.pattern[0].LengthMs = req.body.taste_effects[2].description.pattern[0].LengthMs 
-            effect.taste_effects[3].description.pattern[0].LengthMs = req.body.taste_effects[3].description.pattern[0].LengthMs 
-            effect.taste_effects[0].description.rate.frequency = req.body.taste_effects[0].description.rate.frequency
-            effect.taste_effects[1].description.rate.frequency = req.body.taste_effects[1].description.rate.frequency
-            effect.taste_effects[2].description.rate.frequency = req.body.taste_effects[2].description.rate.frequency
-            effect.taste_effects[3].description.rate.frequency = req.body.taste_effects[3].description.rate.frequency
-            effect.taste_effects[0].description.pattern[0].flavour = req.body.taste_effects[0].description.pattern[0].flavour 
-            effect.taste_effects[1].description.pattern[0].flavour = req.body.taste_effects[1].description.pattern[0].flavour 
-            effect.taste_effects[2].description.pattern[0].flavour = req.body.taste_effects[2].description.pattern[0].flavour 
-            effect.taste_effects[3].description.pattern[0].flavour = req.body.taste_effects[3].description.pattern[0].flavour 
+        case "Taste":
+            effect = await Taste.findById(id)
+            if (!effect){
+                effect = new Taste(req.body);
+                effect.deviceId=req.body.deviceId;
+                remove(id, previousCategory)
+            }else{
+                setEffect(effect,req);
+            }
             break;
     }    
     await effect.save();
-    console.log(effect);
     res.status(200).send(effect)
 })
 

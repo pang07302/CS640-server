@@ -22,8 +22,6 @@
     "express": "^4.17.3",
     "mongoose": "^6.2.6",
     "nano-time": "^1.0.0",
-    "nodemon": "^2.0.15",
-    "request": "^2.88.2",
-    "response-time": "^2.3.2"
+    "nodemon": "^2.0.15"
   }
 }
