@@ -3,23 +3,18 @@ const mongoose = require('mongoose')
 const cors = require('cors')
 const PORT = process.env.port || 8000
 const app = express()
-const {Device, Effect, Sight, Audio, Haptic, Smell, Taste} = require('./model/model')
+const {Device, Sight, Audio, Haptic, Smell, Taste} = require('./model/model')
 const {exec} =  require('node:child_process');
-
 const fs = require('fs')
 const now = require('nano-time');
 
-
 const url = 'mongodb+srv://user:user@cluster0.ts2fe.mongodb.net/myFirstDatabase?retryWrites=true&w=majority'
-
 mongoose.connect(url, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
-   
 }).then(()=>{
     console.log('Connected to database')
 }).catch(err => console.log(err))
-
 
 app.use(cors({
     origin: function(origin, callback){
@@ -28,16 +23,6 @@ app.use(cors({
     optionsSuccessStatus: 200,
     credentials: true
   }));
-
-
-
-// https://www.freecodecamp.org/news/shell-scripting-crash-course-how-to-write-bash-scripts-in-linux/#:~:text=What%20is%20a%20Bash%20Script%3F,it%20using%20the%20command%20line.
-// https://stackoverflow.com/questions/19743396/cors-cannot-use-wildcard-in-access-control-allow-origin-when-credentials-flag-i
-
-
-
-
-
 
 app.use(express.json({limit: '50mb'}))
 app.use(express.urlencoded({ extended: true, limit: '50mb'}))
@@ -63,30 +48,6 @@ app.get('/createDeviceTable', async(req,res)=>{
         }
     })  
 });
-
-
-// create the default effect table
-app.get('/createEffectTable', async(req,res)=>{
-    console.log(req.body)
-    Effect.findOne({category: req.body.effect[0].category}, async(err, result) => {
-        if (err) throw err
-        if (result){
-            console.log('Table has already exists')
-            res.send('Table has already exists')
-        }else{
-            for (var i=0; i<req.body.effect.length; i++){
-                let effect = new Effect(req.body.effect[i])
-                console.log(effect);
-                await effect.save()
-            } 
-            res.send('create data successfully')
-        }
-    })  
-});
-
-
-
-
 
 // check whether the default table contains the device and deploy 
 app.get('/fans', async(req,res)=>{
@@ -119,9 +80,6 @@ app.get('/fans', async(req,res)=>{
         }
     })    
 });
-
-// console.log("sendBackTime:",sendBackTime)
-//                     console.log(`Device: ${device.name}, ID: ${device.id} is ${req.body.status}`)
 
 function runBashScript(status){
     switch (status){
@@ -171,7 +129,6 @@ app.get('/customDevice', async(req,res)=>{
     })    
 });
 
-// get effects id
 app.get('/getDeviceEffectsId/:device', async(req,res)=>{ 
     let device = await Device.findOne({name:req.params.device});
     if (!device){
@@ -299,7 +256,6 @@ function setEffect(effect, req){
     effect.description.pattern.type = req.body.description.pattern.type;
     effect.description.pattern.LengthMs = req.body.description.pattern.LengthMs;
 }
-
 
 app.get('/ManageEffect/:effectId', async(req,res) => {
     let category = req.body.category;

@@ -1,5 +1,12 @@
 const mongoose = require('mongoose')
 
+const deviceSchema = new mongoose.Schema({
+  id: { type: Number},
+  name: { type: String},
+  category: { type: String},
+})  
+const Device = new mongoose.model('Device', deviceSchema);
+
 const hapticSchema = new mongoose.Schema({
         deviceId : String,
         control:String,
@@ -96,22 +103,7 @@ const tasteSchema = new mongoose.Schema({
 })
 const Taste = new mongoose.model('Taste', tasteSchema);
  
-
-const deviceSchema = new mongoose.Schema({
-  id: { type: Number},
-  name: { type: String},
-  category: { type: String},
-})  
-const Device = new mongoose.model('Device', deviceSchema);
-
-const effectSchema = new mongoose.Schema({
-  id: { type: Number},
-  category: {type: String},
-})
-const Effect = new mongoose.model('Effect', effectSchema);
-
 module.exports.Device = Device;
-module.exports.Effect = Effect;
 module.exports.Haptic = Haptic;
 module.exports.Sight = Sight;
 module.exports.Audio = Audio;
